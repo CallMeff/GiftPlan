@@ -1,0 +1,33 @@
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+
+http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" metadata-complete="true">
+
+    <!-- 定义欢迎页，当通过跟路径/访问项目时，默认跳转到index.jsp视图中 -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- 配置springMVC控制器的拦截url,默认所有url都被拦截 -->
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--还需要配置springMVC需要加载的配置文件-->
+        <!--spring-dao.xml,spring-service.xml,spring-web.xml-->
+        <!--mybatis -> spring -> springMVC-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/spring-*.xml</param-value>
+        </init-param>
+        <!-- 设置当前servlet在所有servlet中第一个启动 -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+
+</web-app>

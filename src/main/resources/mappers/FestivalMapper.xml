@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feng.dao.FestivalMapper" >
+  <resultMap id="BaseResultMap" type="com.feng.entity.Festival" >
+    <constructor >
+      <idArg column="festival_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="festival_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="festival_date_new" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="festival_date_lunar" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="neck_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="destival_stroy" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    festival_id, festival_name, festival_date_new, festival_date_lunar, neck_name, destival_stroy
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_festival
+    where festival_id = #{festivalId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_festival
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_festival
+    where festival_id = #{festivalId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.feng.entity.Festival" >
+    insert into t_festival (festival_id, festival_name, festival_date_new, 
+      festival_date_lunar, neck_name, destival_stroy
+      )
+    values (#{festivalId,jdbcType=INTEGER}, #{festivalName,jdbcType=VARCHAR}, #{festivalDateNew,jdbcType=VARCHAR}, 
+      #{festivalDateLunar,jdbcType=VARCHAR}, #{neckName,jdbcType=VARCHAR}, #{destivalStroy,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.feng.entity.Festival" >
+    insert into t_festival
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="festivalId != null" >
+        festival_id,
+      </if>
+      <if test="festivalName != null" >
+        festival_name,
+      </if>
+      <if test="festivalDateNew != null" >
+        festival_date_new,
+      </if>
+      <if test="festivalDateLunar != null" >
+        festival_date_lunar,
+      </if>
+      <if test="neckName != null" >
+        neck_name,
+      </if>
+      <if test="destivalStroy != null" >
+        destival_stroy,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="festivalId != null" >
+        #{festivalId,jdbcType=INTEGER},
+      </if>
+      <if test="festivalName != null" >
+        #{festivalName,jdbcType=VARCHAR},
+      </if>
+      <if test="festivalDateNew != null" >
+        #{festivalDateNew,jdbcType=VARCHAR},
+      </if>
+      <if test="festivalDateLunar != null" >
+        #{festivalDateLunar,jdbcType=VARCHAR},
+      </if>
+      <if test="neckName != null" >
+        #{neckName,jdbcType=VARCHAR},
+      </if>
+      <if test="destivalStroy != null" >
+        #{destivalStroy,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.feng.entity.Festival" >
+    update t_festival
+    <set >
+      <if test="festivalName != null" >
+        festival_name = #{festivalName,jdbcType=VARCHAR},
+      </if>
+      <if test="festivalDateNew != null" >
+        festival_date_new = #{festivalDateNew,jdbcType=VARCHAR},
+      </if>
+      <if test="festivalDateLunar != null" >
+        festival_date_lunar = #{festivalDateLunar,jdbcType=VARCHAR},
+      </if>
+      <if test="neckName != null" >
+        neck_name = #{neckName,jdbcType=VARCHAR},
+      </if>
+      <if test="destivalStroy != null" >
+        destival_stroy = #{destivalStroy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where festival_id = #{festivalId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.feng.entity.Festival" >
+    update t_festival
+    set festival_name = #{festivalName,jdbcType=VARCHAR},
+      festival_date_new = #{festivalDateNew,jdbcType=VARCHAR},
+      festival_date_lunar = #{festivalDateLunar,jdbcType=VARCHAR},
+      neck_name = #{neckName,jdbcType=VARCHAR},
+      destival_stroy = #{destivalStroy,jdbcType=VARCHAR}
+    where festival_id = #{festivalId,jdbcType=INTEGER}
+  </update>
+</mapper>

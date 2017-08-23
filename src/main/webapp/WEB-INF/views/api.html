@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>API-TESTER</title>
+<style>
+input,select {
+	font-size: 12px;
+	color: #000;
+	border: 1px solid #bababa;
+	margin: 0;
+}
+</style>
+<script type="text/javascript" src="resources/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="resources/js/json_beauty.js"></script>
+<script type="text/javascript" src="resources/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+	var successCount = 0;//成功次数
+	var failCount = 0;//失败次数
+	var startTime = 0;//开始时间（用于计算调用时耗）
+	var endTime = 0;//结束时间（用于计算调用时耗）
+	//API调用	
+	function execute() {
+		startTime = getCurrentTimeMillis();//获得当前时间毫秒
+		var className = $("#className").val();
+		var methodName = $("#methodName").val();
+		//远程服务器
+//		var url = "119.23.40.101:10086/windsen/"+className+methodName;
+        //本地服务器
+        var url = "localhost:10086/windsen/"+className+methodName;
+		console.log(url);
+		$.ajax({
+			url : url,
+			type : 'post',
+			async : false,
+			dataType : 'json',
+			timeout : 100000,
+			error : function(ret) {
+				deal_error(ret);
+			},
+			success : function(xml) {
+				deal_result(xml);
+			},
+			data : $("#request").val()
+		//请求参数
+		});
+	}
+	//
+	function deal_result(res) {
+		if (res.result == 0 || res.result == 256) {
+			set_output(JSON.stringify(res));
+			echoOk();
+			calcReturn(res);
+		} else if (res.result == 511 && res.cmd == "init") {
+			set_output(JSON.stringify(res));
+			echoOk();
+			calcReturn(res);
+			$("#console").val(
+					$("#console").val() + res.cmd + ":\t" + res.resultNote
+							+ "\n");
+		} else {
+			var out = JSON.stringify(res);
+			echoError();
+			set_output(out);
+			if (res.cmd) {
+				$("#console").val(
+						$("#console").val() + res.cmd + ":\t" + res.resultNote
+								+ "\n");
+			} else {
+				$("#console").val(
+						$("#console").val() + "remote invoke:\t"
+								+ res.resultNote + "\n");
+			}
+		}
+
+		endTime = getCurrentTimeMillis();
+		$("#console").val(
+				"[" + res.cmd + "] spend " + (endTime - startTime) + " ms \n"
+						+ $("#console").val());
+	}
+
+	function calcReturn(res) {
+		$("#resultNo").html("<"+res.totalRecordNum+">");
+	}
+	//失败
+	function deal_error(res) {
+		set_output(JSON.stringify(res));
+		echoError();
+	}
+	//失败提示
+	function echoError() {
+		failCount = failCount + 1;
+		$("#detailResult").html(
+				"<font color='green'>成功:[" + successCount
+						+ "]</font>/<font color='red'>失败:[" + failCount
+						+ "]</font>");
+	}
+	//成功提示
+	function echoOk() {
+		successCount = successCount + 1;
+		$("#detailResult").html(
+				"<font color='green'>成功:[" + successCount
+						+ "]</font>/<font color='red'>失败:[" + failCount
+						+ "]</font>");
+	}
+
+	function formatJson() {
+
+		var jsontxt = js_beautify(unpacker_filter($("#request").val()), {
+			indent_size : 2,
+			indent_char : ' ',
+			preserve_newlines : true,
+			brace_style : 'expand',
+			keep_array_indentation : true,
+			space_after_anon_function : true
+		});
+		$("#request").val(jsontxt);
+		//set_output("");
+	}
+
+	function ui_init(request) {
+		var jsontxt = js_beautify(unpacker_filter(request), {
+			indent_size : 2,
+			indent_char : ' ',
+			preserve_newlines : true,
+			brace_style : 'expand',
+			keep_array_indentation : true,
+			space_after_anon_function : true
+		});
+		$("#request").val(jsontxt);
+		set_output("");
+	}
+
+	function set_output(response) {
+		if (!response) {
+			$("#response").val("");
+		} else {
+			var jsontxt = js_beautify(unpacker_filter(response), {
+				indent_size : 2,
+				indent_char : ' ',
+				preserve_newlines : true,
+				brace_style : 'expand',
+				keep_array_indentation : false,
+				space_after_anon_function : true
+			});
+			$("#response").val(jsontxt);
+		}
+	}
+
+	//business function start
+
+	function signin() {
+		var request = '{"cmd": "signin","params": {"loginId": "zywl","password": "e19d5cd5af0378da05f63f891c7467af"}}';
+		ui_init(request);
+	}
+	
+	function signout() {
+		var request = '{"cmd": "signout","loginUserId":"0512140555708261","params": {}}';
+		ui_init(request);
+	}
+	
+	function queryUserSelf() {
+		var request = '{"cmd": "queryUserSelf","loginUserId":"05121405557082611","params": {}}';
+		ui_init(request);
+	}
+	
+	function sendVerifyCode() {
+		var request = '{"cmd": "sendVerifyCode","params": {"mobilePhone": "15000000001","verifyCodeType": "1"}}';
+		ui_init(request);
+	}
+
+	
+	//----------------------ecode 数据验证接口-----------------------
+
+	function showRequest() {
+		eval($("#cmd").val());
+	}
+
+	//获得当前毫秒
+	function getCurrentTimeMillis() {
+		var now = new Date();
+		return now.getHours() * 60 * 60 * 1000 + now.getMinutes() * 60 * 1000
+				+ now.getSeconds() * 1000 + now.getMilliseconds();
+	}
+
+	function dateString() {
+		var randSuffix = Math.round(Math.random() * 1000000);
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth();
+		var dat = date.getDate();
+		var hour = date.getHours();
+		var minute = date.getMinutes();
+		var second = date.getSeconds();
+		var milisecond = date.getMilliseconds();
+		//return year+""+month+""+dat+""+hour+""+minute+""+second+""+milisecond+"_"+randSuffix;
+		return year + "" + month + "" + dat + "" + hour + "" + minute + ""
+				+ second;//+""+milisecond+"_"+randSuffix;
+	}
+	//设置报文内容框大小
+	function initSize() {
+		$("#request").css("width", 500);
+		$("#request").css("height", $(document).height() - 300);
+
+		$("#response").css("width", $(document).width() - 600);
+		$("#response").css("height", $(document).height() - 300);
+
+		$("#console").css("width", $(document).width() - 84);
+		$("#console").css("height", 220);
+	}
+
+	//页面初始化加载
+	$(document).ready(function() {
+		initSize();
+	});
+</script>
+</head>
+<body style="font-family: 'Courier New';">
+<input type="text" name="className" id="className">
+<input type="text" name="methodName" id="methodName">
+	<div id="command">
+		<label for="url">API接口</label> <select name="url" id="url"
+			onchange="showRequest()">
+			<option value="">--------------请选择--------------</option>
+			<option value="">--------------个人中心--------------</option>
+			<option value="signin()">signin</option>
+			<option value="signout()">signout</option>
+			<option value="queryUserSelf()">queryUserSelf</option>
+			<option value="sendVerifyCode()">sendVerifyCode</option>
+		</select> <input type="button" onclick="execute()" value="发送请求"> <input
+			type="button" onclick="formatJson()" value="格式JSON"> <label
+			id="detailResult"></label> <label id="resultNo"></label>
+
+	</div>
+	<hr>
+	<textarea id="request"
+		style="font-family: 'Courier New'; resize: none;"></textarea>
+	<textarea id="response"
+		style="font-family: 'Courier New'; resize: none;" readonly></textarea>
+	<br>
+	<textarea id="console" style="resize: none" readonly></textarea>
+
+</body>
+</html>
